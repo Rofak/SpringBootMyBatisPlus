@@ -1,0 +1,1 @@
+ALTER  TABLE user ADD address_id int(11) AFTER id
