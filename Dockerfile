@@ -4,7 +4,6 @@ FROM openjdk:21-jdk-slim
 # Set the working directory to /app
 WORKDIR /app
 
-CMD["mvn","install"]
 # Copy the packaged JAR file into the container at /app
 COPY target/SpringMyBatisPlusDemo-0.0.1-SNAPSHOT.jar /app/springboot-docker-demo.jar
 
