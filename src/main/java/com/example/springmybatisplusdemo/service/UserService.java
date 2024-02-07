@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface UserService extends MPJBaseService<User> {
     List<UserResponse> selectByProvider();
+
+    User selectByMapperXml();
 }

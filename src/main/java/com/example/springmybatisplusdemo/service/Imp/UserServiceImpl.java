@@ -23,4 +23,9 @@ public class UserServiceImpl extends MPJBaseServiceImpl<UserMapper, User> implem
     public List<UserResponse> selectByProvider() {
         return repository.selectUserAddressAndPost();
     }
+
+    @Override
+    public User selectByMapperXml() {
+        return repository.findAllByXml();
+    }
 }

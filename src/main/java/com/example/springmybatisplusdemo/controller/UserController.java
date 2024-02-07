@@ -92,4 +92,9 @@ public class UserController {
     public List<UserResponse> selectUserByProvider(){
         return userService.selectByProvider();
     }
+
+    @GetMapping("/mapper-xml")
+    public User getUserByXml(){
+        return this.userService.selectByMapperXml();
+    }
 }

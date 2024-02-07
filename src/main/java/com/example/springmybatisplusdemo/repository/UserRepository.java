@@ -3,6 +3,7 @@ package com.example.springmybatisplusdemo.repository;
 import com.example.springmybatisplusdemo.dto.response.UserResponse;
 import com.example.springmybatisplusdemo.entities.Address;
 import com.example.springmybatisplusdemo.entities.Post;
+import com.example.springmybatisplusdemo.entities.User;
 import com.example.springmybatisplusdemo.repository.provider.UserProvider;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,6 @@ public interface UserRepository {
             @Result(column = "publishedDate",property = "published_date")
     })
     Post selectPostByUserId(int userId);
+
+    User findAllByXml();
 }
