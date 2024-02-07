@@ -9,6 +9,7 @@ import java.io.Serializable;
 @TableName("user")
 public class User implements Serializable {
     private int id;
+    private Integer address_id;
     private String name;
     private Integer age;
     private String email;

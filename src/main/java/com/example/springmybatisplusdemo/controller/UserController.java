@@ -1,17 +1,23 @@
 package com.example.springmybatisplusdemo.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springmybatisplusdemo.dto.response.UserResponse;
 import com.example.springmybatisplusdemo.dto.user.CreateUserDto;
 import com.example.springmybatisplusdemo.dto.user.UpdateUserDto;
+import com.example.springmybatisplusdemo.entities.Address;
 import com.example.springmybatisplusdemo.entities.Post;
 import com.example.springmybatisplusdemo.entities.User;
+import com.example.springmybatisplusdemo.repository.UserRepository;
 import com.example.springmybatisplusdemo.service.UserService;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.ibatis.javassist.NotFoundException;
+import org.apache.ibatis.reflection.ArrayUtil;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,8 +46,10 @@ public class UserController {
     public Map<String,Object> getAllUsers(@RequestParam int pageNum, @RequestParam int pageSize) {
         MPJLambdaWrapper<User> lambdaWrapper=new MPJLambdaWrapper<User>()
                 .selectAll(User.class)
+                .leftJoin(Address.class,Address::getId,User::getAddress_id)
+                .leftJoin(Post.class,Post::getUser_id,User::getId)
                 .selectCollection(Post.class,UserResponse::getPosts)
-                .leftJoin(Post.class,Post::getUser_id,User::getId);
+                .selectAssociation(Address.class, UserResponse::getAddress);
         IPage<UserResponse> page=userService.selectJoinListPage(new Page<>(pageNum,pageSize), UserResponse.class,lambdaWrapper);
         Map<String,Object> pagination=new HashMap<>();
         pagination.put("count",page.getTotal());
@@ -53,13 +61,18 @@ public class UserController {
 
     @Cacheable(value = "user",key = "#id")
     @GetMapping("/{id}")
-    public UserResponse getUserById(@PathVariable int id){
+    public UserResponse getUserById(@PathVariable int id) throws NotFoundException{
         MPJLambdaWrapper<User> lambdaWrapper=new MPJLambdaWrapper<User>()
                 .selectAll(User.class)
-                .selectCollection(Post.class,UserResponse::getPosts)
                 .leftJoin(Post.class,Post::getUser_id,User::getId)
+                .leftJoin(Address.class,Address::getId,User::getAddress_id)
+                .selectCollection(Post.class,UserResponse::getPosts)
+                .selectAssociation(Address.class,UserResponse::getAddress)
                 .eq(User::getId,id);
         UserResponse user=userService.selectJoinOne(UserResponse.class,lambdaWrapper);
+        if(ObjectUtils.isEmpty(user)){
+            throw new NotFoundException("User Not Found!");
+        }
         return user;
     }
 
